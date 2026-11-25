@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <defs>
+    <linearGradient id="pf-icon-grad" x1="0" y1="32" x2="32" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FE7AC6" />
+      <stop offset="100%" stop-color="#FF4665" />
+    </linearGradient>
+  </defs>
+  <rect width="32" height="32" rx="8" fill="url(#pf-icon-grad)" />
+  <path
+    d="M8.2 9.2H16.6C18.6 9.2 19.8 10.4 19.8 12.4V15.2C19.8 17.2 18.6 18.4 16.6 18.4H11.5V23.2H8.2V9.2ZM11.5 12.1V15.5H16.2C16.5 15.5 16.7 15.3 16.7 15V12.6C16.7 12.3 16.5 12.1 16.2 12.1H11.5Z"
+    fill="#FFFFFF"
+  />
+  <path
+    d="M21.2 12.6C21.2 10.6 22.4 9.2 24.4 9.2H25.8V12H24.6C24.2 12 24 12.2 24 12.7V14H25.8V16.6H24V23.2H21.2V16.6H19.9V14H21.2V12.6Z"
+    fill="#FFFFFF"
+  />
+</svg>

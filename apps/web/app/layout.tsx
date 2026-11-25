@@ -1,15 +1,40 @@
+import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 
 import "@workspace/ui/globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
-import { cn } from "@workspace/ui/lib/utils";
+import { TooltipProvider } from "@workspace/ui/components/tooltip"
+import { Toaster } from "@workspace/ui/components/sonner"
+import { cn } from "@workspace/ui/lib/utils"
+import { PreflopProvider } from "@/components/preflop/store"
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'})
-
-const fontMono = Geist_Mono({
+const geistSans = Geist({
   subsets: ["latin"],
-  variable: "--font-mono",
+  variable: "--font-geist-sans",
 })
+
+const geistMono = Geist_Mono({
+  subsets: ["latin"],
+  variable: "--font-geist-mono",
+})
+
+export const metadata: Metadata = {
+  title: "Preflop | Trade on People — Human Capital Markets",
+  description:
+    "Prediction markets on people's milestones and liquid human capital rails. Follow a trajectory, take a view on concrete outcomes, and back conviction early.",
+  openGraph: {
+    title: "Preflop | Trade on People — Human Capital Markets",
+    description:
+      "Prediction markets on people's milestones and standardized Trajectory Units. Backed by Verdict Capital and Afore Capital.",
+    type: "website",
+    siteName: "Preflop",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Preflop | Trade on People — Human Capital Markets",
+    description:
+      "Prediction markets on people's milestones and standardized Trajectory Units. Backed by Verdict Capital and Afore Capital.",
+  },
+}
 
 export default function RootLayout({
   children,
@@ -19,11 +44,19 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      suppressHydrationWarning
-      className={cn("antialiased", fontMono.variable, "font-sans", geist.variable)}
+      className={cn(
+        "scroll-smooth antialiased",
+        geistSans.variable,
+        geistMono.variable
+      )}
     >
-      <body>
-        <ThemeProvider>{children}</ThemeProvider>
+      <body className="min-h-screen bg-white text-black antialiased">
+        <PreflopProvider>
+          <TooltipProvider delayDuration={150}>
+            {children}
+            <Toaster theme="light" position="bottom-right" richColors />
+          </TooltipProvider>
+        </PreflopProvider>
       </body>
     </html>
   )
