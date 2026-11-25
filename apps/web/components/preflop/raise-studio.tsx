@@ -219,6 +219,7 @@ export function RaiseStudio() {
                     </span>
                   </div>
                   <Slider
+                    name="raiseAmount"
                     aria-label="Target Raise Amount"
                     min={25000}
                     max={500000}
@@ -248,6 +249,7 @@ export function RaiseStudio() {
                     </span>
                   </div>
                   <Slider
+                    name="incomeSharePct"
                     aria-label="Finite Income or TEB Share"
                     min={1}
                     max={12}
@@ -272,6 +274,7 @@ export function RaiseStudio() {
                       </span>
                     </div>
                     <Slider
+                      name="termYears"
                       aria-label="Covenant Term Years"
                       min={3}
                       max={10}
@@ -294,6 +297,7 @@ export function RaiseStudio() {
                       </span>
                     </div>
                     <Slider
+                      name="conversionUnitsPct"
                       aria-label="Post-Term Conversion Units"
                       min={0.5}
                       max={5}
@@ -611,6 +615,7 @@ export function RaiseStudio() {
                     </span>
                   </div>
                   <Slider
+                    name="directFloatPct"
                     aria-label="Initial Float Listed"
                     min={2}
                     max={20}

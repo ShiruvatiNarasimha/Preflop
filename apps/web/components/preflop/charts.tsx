@@ -24,6 +24,7 @@ import {
   PieChart,
   PolarAngleAxis,
   PolarGrid,
+  PolarRadiusAxis,
   Radar,
   RadarChart,
   ReferenceLine,
@@ -61,6 +62,20 @@ function formatUnixTime(t: Time): string {
     })
   }
   return String(t)
+}
+
+function toShortRadarLabel(name: string): string {
+  const cleaned = name
+    .replace(/\band\b/gi, "")
+    .replace(/&/g, "")
+    .replace(/-/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+  const words = cleaned.split(" ").filter(Boolean)
+  if (words.length <= 1) return cleaned.slice(0, 12)
+  const two = `${words[0]} ${words[1]}`
+  if (two.length <= 13) return two
+  return words[0]!.slice(0, 12)
 }
 
 interface CompareSeriesItem {
@@ -127,7 +142,7 @@ export function MilestoneTradingChart({
       },
       rightPriceScale: {
         borderColor: "rgba(0, 0, 0, 0.07)",
-        scaleMargins: { top: 0.12, bottom: 0.12 },
+        scaleMargins: { top: 0.17, bottom: 0.14 },
       },
       timeScale: {
         borderColor: "rgba(0, 0, 0, 0.07)",
@@ -345,7 +360,7 @@ export function TrajectoryTradingChart({
       },
       rightPriceScale: {
         borderColor: "rgba(0, 0, 0, 0.07)",
-        scaleMargins: { top: 0.14, bottom: 0.12 },
+        scaleMargins: { top: 0.16, bottom: 0.14 },
       },
       timeScale: {
         borderColor: "rgba(0, 0, 0, 0.07)",
@@ -419,6 +434,7 @@ export function TrajectoryTradingChart({
 
 /**
  * Recharts Mini Sparkline for /markets person cards
+ * Tight auto-scaled Y domain so real price trajectories read clearly.
  */
 export function MiniSparklineChart({
   data,
@@ -427,8 +443,12 @@ export function MiniSparklineChart({
   data: { i: number; v: number }[]
   positive?: boolean
 }) {
-  const gradId = React.useId()
+  const gradId = `spark-${React.useId().replace(/:/g, "")}`
   const stroke = positive ? "#FF4665" : "#71717A"
+  const values = data.map((d) => d.v)
+  const min = Math.min(...values)
+  const max = Math.max(...values)
+  const pad = Math.max(0.4, (max - min) * 0.18)
 
   return (
     <div className="h-[32px] w-[78px] shrink-0 overflow-hidden">
@@ -440,15 +460,16 @@ export function MiniSparklineChart({
       >
         <defs>
           <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={stroke} stopOpacity={0.26} />
-            <stop offset="100%" stopColor={stroke} stopOpacity={0} />
+            <stop offset="0%" stopColor={stroke} stopOpacity={0.28} />
+            <stop offset="100%" stopColor={stroke} stopOpacity={0.02} />
           </linearGradient>
         </defs>
+        <YAxis hide domain={[min - pad, max + pad]} />
         <Area
           type="monotone"
           dataKey="v"
           stroke={stroke}
-          strokeWidth={1.6}
+          strokeWidth={1.7}
           fill={`url(#${gradId})`}
           isAnimationActive={false}
         />
@@ -473,7 +494,7 @@ export function ConvictionRadarChart({
   signals: ConvictionSignal[]
 }) {
   const data = signals.map((s) => ({
-    subject: s.name.split(" ").slice(0, 2).join(" "),
+    subject: toShortRadarLabel(s.name),
     fullName: s.name,
     score: s.score,
   }))
@@ -481,13 +502,26 @@ export function ConvictionRadarChart({
   return (
     <ChartContainer
       config={convictionChartConfig}
-      className="mx-auto aspect-square max-h-[240px] w-full"
+      initialDimension={{ width: 280, height: 240 }}
+      className="mx-auto h-[245px] w-full max-w-[300px] aspect-auto"
     >
-      <RadarChart data={data} cx="50%" cy="50%" outerRadius="72%">
-        <PolarGrid stroke="rgba(0,0,0,0.08)" />
+      <RadarChart
+        data={data}
+        cx="50%"
+        cy="50%"
+        outerRadius="56%"
+        margin={{ top: 18, right: 34, bottom: 18, left: 34 }}
+      >
+        <PolarGrid stroke="rgba(0,0,0,0.09)" />
+        <PolarRadiusAxis
+          angle={30}
+          domain={[0, 100]}
+          tick={false}
+          axisLine={false}
+        />
         <PolarAngleAxis
           dataKey="subject"
-          tick={{ fill: "#52525B", fontSize: 10.5 }}
+          tick={{ fill: "#52525B", fontSize: 10.5, fontWeight: 500 }}
         />
         <ChartTooltip
           cursor={false}
@@ -496,9 +530,16 @@ export function ConvictionRadarChart({
         <Radar
           dataKey="score"
           stroke="#FF4665"
-          strokeWidth={2}
+          strokeWidth={2.2}
           fill="#FF4665"
-          fillOpacity={0.2}
+          fillOpacity={0.22}
+          dot={{
+            r: 3.5,
+            fill: "#FF4665",
+            stroke: "#FFFFFF",
+            strokeWidth: 1.5,
+          }}
+          isAnimationActive={false}
         />
       </RadarChart>
     </ChartContainer>
@@ -520,24 +561,28 @@ export function PortfolioEquityChart({
 }: {
   data: { label: string; equity: number }[]
 }) {
-  const gradId = React.useId()
+  const gradId = `equity-${React.useId().replace(/:/g, "")}`
   const vals = data.map((d) => d.equity)
-  const minVal = Math.floor(Math.min(...vals, 99800) - 120)
-  const maxVal = Math.ceil(Math.max(...vals, 100200) + 120)
+  const minData = Math.min(...vals, 100000)
+  const maxData = Math.max(...vals, 100000)
+  const spread = Math.max(80, (maxData - minData) * 0.45)
+  const minVal = Math.floor(minData - spread)
+  const maxVal = Math.ceil(maxData + spread)
 
   return (
     <ChartContainer
       config={equityChartConfig}
-      className="h-[220px] w-full aspect-auto"
+      initialDimension={{ width: 560, height: 225 }}
+      className="h-[225px] w-full aspect-auto"
     >
       <AreaChart
         data={data}
-        margin={{ top: 10, right: 12, left: 6, bottom: 0 }}
+        margin={{ top: 12, right: 14, left: 6, bottom: 2 }}
       >
         <defs>
           <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#FF4665" stopOpacity={0.25} />
-            <stop offset="95%" stopColor="#FE7AC6" stopOpacity={0.01} />
+            <stop offset="5%" stopColor="#FF4665" stopOpacity={0.26} />
+            <stop offset="95%" stopColor="#FE7AC6" stopOpacity={0.02} />
           </linearGradient>
         </defs>
         <CartesianGrid
@@ -558,11 +603,11 @@ export function PortfolioEquityChart({
           axisLine={false}
           width={64}
           tick={{ fontSize: 11, fill: "#71717A" }}
-          tickFormatter={(v: number) => `$${(v / 1000).toFixed(1)}k`}
+          tickFormatter={(v: number) => `$${(v / 1000).toFixed(2)}k`}
         />
         <ReferenceLine
           y={100000}
-          stroke="rgba(0,0,0,0.18)"
+          stroke="rgba(0,0,0,0.22)"
           strokeDasharray="4 4"
         />
         <ChartTooltip
@@ -585,8 +630,21 @@ export function PortfolioEquityChart({
           type="monotone"
           dataKey="equity"
           stroke="#FF4665"
-          strokeWidth={2.2}
+          strokeWidth={2.4}
           fill={`url(#${gradId})`}
+          dot={{
+            r: 3,
+            fill: "#FF4665",
+            stroke: "#FFFFFF",
+            strokeWidth: 1.5,
+          }}
+          activeDot={{
+            r: 5,
+            fill: "#FF4665",
+            stroke: "#FFFFFF",
+            strokeWidth: 2,
+          }}
+          isAnimationActive={false}
         />
       </AreaChart>
     </ChartContainer>
@@ -612,15 +670,31 @@ export function PortfolioAllocationChart({
   trajectory: number
 }) {
   const data = [
-    { key: "cash", name: "Cash Available", value: Math.max(0, cash), fill: "#E4E4E7" },
-    { key: "milestones", name: "Milestones", value: Math.max(0, milestones), fill: "#FF4665" },
-    { key: "trajectory", name: "Trajectory Units", value: Math.max(0, trajectory), fill: "#7D2BC4" },
+    {
+      key: "cash",
+      name: "Cash Available",
+      value: Math.max(0, cash),
+      fill: "#E4E4E7",
+    },
+    {
+      key: "milestones",
+      name: "Milestones",
+      value: Math.max(0, milestones),
+      fill: "#FF4665",
+    },
+    {
+      key: "trajectory",
+      name: "Trajectory Units",
+      value: Math.max(0, trajectory),
+      fill: "#7D2BC4",
+    },
   ].filter((d) => d.value > 0)
 
   return (
     <ChartContainer
       config={allocationChartConfig}
-      className="mx-auto aspect-square max-h-[195px] w-full"
+      initialDimension={{ width: 185, height: 185 }}
+      className="mx-auto h-[185px] w-[185px] aspect-square"
     >
       <PieChart>
         <ChartTooltip
@@ -643,10 +717,11 @@ export function PortfolioAllocationChart({
           data={data}
           dataKey="value"
           nameKey="name"
-          innerRadius={56}
-          outerRadius={80}
+          innerRadius={54}
+          outerRadius={78}
           paddingAngle={2}
           strokeWidth={0}
+          isAnimationActive={false}
         >
           {data.map((entry) => (
             <Cell key={entry.key} fill={entry.fill} />
@@ -658,12 +733,13 @@ export function PortfolioAllocationChart({
 }
 
 /**
- * Recharts 7-Year Covenant Cashflow & Payback Projection Chart for /raise
+ * Recharts Multi-Year Covenant Cashflow & Payback Projection Chart for /raise
+ * Dual Y-Axis: Left = Projected Annual TEB (bars), Right = Annual Covenant Payout (coral area)
  */
 const covenantChartConfig = {
   projectedTeb: {
     label: "Projected Annual TEB",
-    color: "#F4F4F5",
+    color: "#DFDFE6",
   },
   covenantShare: {
     label: "Annual Covenant Payout",
@@ -680,9 +756,12 @@ export function CovenantProjectionChart({
   incomeSharePct: number
   termYears: number
 }) {
+  const gradId = `cov-${React.useId().replace(/:/g, "")}`
   const baseAnnual = Math.max(
     140_000,
-    Math.round(raiseAmount / Math.max(0.08, (incomeSharePct / 100) * termYears) * 0.72)
+    Math.round(
+      (raiseAmount / Math.max(0.08, (incomeSharePct / 100) * termYears)) * 0.72
+    )
   )
 
   const data = Array.from({ length: termYears }, (_, i) => {
@@ -700,12 +779,19 @@ export function CovenantProjectionChart({
   return (
     <ChartContainer
       config={covenantChartConfig}
-      className="h-[205px] w-full aspect-auto"
+      initialDimension={{ width: 460, height: 215 }}
+      className="h-[215px] w-full aspect-auto"
     >
       <ComposedChart
         data={data}
-        margin={{ top: 10, right: 8, left: 4, bottom: 0 }}
+        margin={{ top: 12, right: 6, left: 2, bottom: 0 }}
       >
+        <defs>
+          <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="#FF4665" stopOpacity={0.28} />
+            <stop offset="95%" stopColor="#FE7AC6" stopOpacity={0.03} />
+          </linearGradient>
+        </defs>
         <CartesianGrid
           vertical={false}
           stroke="rgba(0,0,0,0.06)"
@@ -718,36 +804,62 @@ export function CovenantProjectionChart({
           tick={{ fontSize: 11, fill: "#71717A" }}
         />
         <YAxis
+          yAxisId="teb"
           tickLine={false}
           axisLine={false}
-          width={52}
-          tick={{ fontSize: 11, fill: "#71717A" }}
+          width={48}
+          tick={{ fontSize: 10.5, fill: "#71717A" }}
+          tickFormatter={(v: number) => `$${Math.round(v / 1000)}k`}
+        />
+        <YAxis
+          yAxisId="payout"
+          orientation="right"
+          tickLine={false}
+          axisLine={false}
+          width={44}
+          tick={{ fontSize: 10.5, fill: "#FF4665" }}
           tickFormatter={(v: number) => `$${Math.round(v / 1000)}k`}
         />
         <ChartTooltip
           content={
             <ChartTooltipContent
-              formatter={(value) => (
-                <span className="font-mono font-medium text-black tabular-nums">
-                  ${Number(value).toLocaleString("en-US")}
-                </span>
+              formatter={(value, name) => (
+                <div className="flex items-center justify-between gap-4 w-full">
+                  <span className="text-[#71717A]">
+                    {name === "projectedTeb"
+                      ? "Est. TEB"
+                      : "Annual Payout"}
+                  </span>
+                  <span className="font-mono font-medium text-black tabular-nums">
+                    ${Number(value).toLocaleString("en-US")}
+                  </span>
+                </div>
               )}
             />
           }
         />
         <Bar
+          yAxisId="teb"
           dataKey="projectedTeb"
-          fill="#EFEFF2"
+          fill="#E4E4EA"
           radius={[6, 6, 0, 0]}
-          maxBarSize={32}
+          maxBarSize={28}
+          isAnimationActive={false}
         />
         <Area
+          yAxisId="payout"
           type="monotone"
           dataKey="covenantShare"
           stroke="#FF4665"
-          strokeWidth={2.2}
-          fill="#FF4665"
-          fillOpacity={0.18}
+          strokeWidth={2.4}
+          fill={`url(#${gradId})`}
+          dot={{
+            r: 3.5,
+            fill: "#FF4665",
+            stroke: "#FFFFFF",
+            strokeWidth: 1.5,
+          }}
+          isAnimationActive={false}
         />
       </ComposedChart>
     </ChartContainer>

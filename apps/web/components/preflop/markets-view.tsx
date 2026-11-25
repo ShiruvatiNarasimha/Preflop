@@ -417,10 +417,10 @@ export function MarketsView() {
               name="marketsSearch"
               aria-label="Search people or milestones"
               type="text"
-              placeholder="Search people, tickers, or milestones..."
+              placeholder="Search people or tickers..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="h-9 w-full sm:w-[250px] rounded-full bg-white border-black/[0.1] pl-9 pr-4 text-[13px] text-black placeholder:text-[#808080] focus-visible:ring-[#ff4665]/25 focus-visible:border-[#ff4665]"
+              className="h-9 w-full sm:w-[240px] rounded-full bg-white border-black/[0.1] pl-9 pr-4 text-[13px] text-black placeholder:text-[#808080] focus-visible:ring-[#ff4665]/25 focus-visible:border-[#ff4665]"
             />
           </div>
 

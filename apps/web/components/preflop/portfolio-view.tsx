@@ -327,32 +327,34 @@ export function PortfolioView() {
       <Card className="mt-5 rounded-[20px] bg-white border-black/[0.07] shadow-none py-0">
         <Tabs defaultValue="positions" className="w-full">
           <div className="px-5 pt-5 pb-3 border-b border-black/[0.06] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <TabsList className="h-9 rounded-full bg-[#F5F5F7] p-1 w-fit">
-              <TabsTrigger
-                value="positions"
-                className="rounded-full px-3.5 text-[12.5px] font-medium data-[state=active]:bg-white data-[state=active]:text-black cursor-pointer"
-              >
-                Open Positions ({openPositionsCount})
-              </TabsTrigger>
-              <TabsTrigger
-                value="fills"
-                className="rounded-full px-3.5 text-[12.5px] font-medium data-[state=active]:bg-white data-[state=active]:text-black cursor-pointer"
-              >
-                Fill Ledger ({fills.length})
-              </TabsTrigger>
-              <TabsTrigger
-                value="watchlist"
-                className="rounded-full px-3.5 text-[12.5px] font-medium data-[state=active]:bg-white data-[state=active]:text-black cursor-pointer"
-              >
-                Following ({followedPeople.length})
-              </TabsTrigger>
-              <TabsTrigger
-                value="drafts"
-                className="rounded-full px-3.5 text-[12.5px] font-medium data-[state=active]:bg-white data-[state=active]:text-black cursor-pointer"
-              >
-                Issuance Drafts ({drafts.length})
-              </TabsTrigger>
-            </TabsList>
+            <div className="overflow-x-auto no-scrollbar max-w-full">
+              <TabsList className="h-9 rounded-full bg-[#F5F5F7] p-1 w-max">
+                <TabsTrigger
+                  value="positions"
+                  className="rounded-full px-3 sm:px-3.5 text-[12px] sm:text-[12.5px] font-medium data-[state=active]:bg-white data-[state=active]:text-black cursor-pointer"
+                >
+                  Open ({openPositionsCount})
+                </TabsTrigger>
+                <TabsTrigger
+                  value="fills"
+                  className="rounded-full px-3 sm:px-3.5 text-[12px] sm:text-[12.5px] font-medium data-[state=active]:bg-white data-[state=active]:text-black cursor-pointer"
+                >
+                  Fills ({fills.length})
+                </TabsTrigger>
+                <TabsTrigger
+                  value="watchlist"
+                  className="rounded-full px-3 sm:px-3.5 text-[12px] sm:text-[12.5px] font-medium data-[state=active]:bg-white data-[state=active]:text-black cursor-pointer"
+                >
+                  Following ({followedPeople.length})
+                </TabsTrigger>
+                <TabsTrigger
+                  value="drafts"
+                  className="rounded-full px-3 sm:px-3.5 text-[12px] sm:text-[12.5px] font-medium data-[state=active]:bg-white data-[state=active]:text-black cursor-pointer"
+                >
+                  Drafts ({drafts.length})
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
             <Link
               href="/markets"

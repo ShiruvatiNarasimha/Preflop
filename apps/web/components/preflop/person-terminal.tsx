@@ -1067,8 +1067,10 @@ export function PersonTerminal({ person }: PersonTerminalProps) {
                         </span>
                         <Input
                           id="ticket-stake"
+                          name="stakeUsd"
                           type="number"
                           min={5}
+                          max={Math.max(1000, Math.floor(cashBalance))}
                           step={5}
                           value={stakeStr}
                           onChange={(e) => setStakeStr(e.target.value)}

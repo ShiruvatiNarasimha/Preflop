@@ -230,7 +230,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     </Link>
                   </SidebarMenuButton>
                   {openPositionsCount > 0 && (
-                    <SidebarMenuBadge className="rounded-full bg-black text-white px-1.5 text-[10px] tabular-nums">
+                    <SidebarMenuBadge className="rounded-full bg-black text-white! peer-hover/menu-button:text-white! peer-data-active/menu-button:bg-[#ff4665]! peer-data-active/menu-button:text-white! px-1.5 text-[10px] font-semibold tabular-nums">
                       {openPositionsCount}
                     </SidebarMenuBadge>
                   )}
@@ -521,7 +521,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Main Scrollable Workspace Content */}
-        <main className="flex-1 min-w-0">{children}</main>
+        <div className="flex-1 min-w-0">{children}</div>
 
         {/* Quiet Institutional Workspace Footer */}
         <footer className="border-t border-black/[0.06] bg-white px-5 sm:px-8 py-4 mt-10">
@@ -639,7 +639,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 return (
                   <CommandItem
                     key={m.id}
-                    value={`${p.name} ${m.title} ${m.question}`}
+                    value={`${p.name} ${p.company} ${m.title}`}
                     onSelect={() => {
                       setCommandOpen(false)
                       router.push(`/person/${p.slug}?milestone=${m.id}`)
