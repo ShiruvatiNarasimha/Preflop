@@ -27,7 +27,6 @@ import {
   Radar,
   RadarChart,
   ReferenceLine,
-  ResponsiveContainer,
   XAxis,
   YAxis,
 } from "recharts"
@@ -432,25 +431,28 @@ export function MiniSparklineChart({
   const stroke = positive ? "#FF4665" : "#71717A"
 
   return (
-    <div className="h-[34px] w-[76px] shrink-0">
-      <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={data} margin={{ top: 2, right: 2, left: 2, bottom: 2 }}>
-          <defs>
-            <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={stroke} stopOpacity={0.28} />
-              <stop offset="100%" stopColor={stroke} stopOpacity={0} />
-            </linearGradient>
-          </defs>
-          <Area
-            type="monotone"
-            dataKey="v"
-            stroke={stroke}
-            strokeWidth={1.6}
-            fill={`url(#${gradId})`}
-            isAnimationActive={false}
-          />
-        </AreaChart>
-      </ResponsiveContainer>
+    <div className="h-[32px] w-[78px] shrink-0 overflow-hidden">
+      <AreaChart
+        width={78}
+        height={32}
+        data={data}
+        margin={{ top: 3, right: 2, left: 2, bottom: 2 }}
+      >
+        <defs>
+          <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={stroke} stopOpacity={0.26} />
+            <stop offset="100%" stopColor={stroke} stopOpacity={0} />
+          </linearGradient>
+        </defs>
+        <Area
+          type="monotone"
+          dataKey="v"
+          stroke={stroke}
+          strokeWidth={1.6}
+          fill={`url(#${gradId})`}
+          isAnimationActive={false}
+        />
+      </AreaChart>
     </div>
   )
 }
