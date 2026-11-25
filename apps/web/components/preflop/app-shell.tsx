@@ -564,7 +564,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         description="Jump to any listed person, milestone market, or workspace page."
         className="sm:max-w-[540px] border border-black/10 shadow-2xl"
       >
-        <Command>
+        <Command
+          filter={(value, search) => {
+            const q = search.trim().toLowerCase()
+            if (!q) return 1
+            return value.toLowerCase().includes(q) ? 1 : 0
+          }}
+        >
           <CommandInput placeholder="Search founders, creators, tickers, or milestones..." />
           <CommandList>
             <CommandEmpty>No matching people or markets found.</CommandEmpty>
